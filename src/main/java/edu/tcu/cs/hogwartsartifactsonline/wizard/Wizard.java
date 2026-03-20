@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 // Wizard class, wizard can own many artifacts
@@ -21,7 +22,7 @@ public class Wizard implements Serializable {
     private String name;
     // Cascade settings
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "owner") // How it's mapped with object relation mapping, the foreign key is given up
-    private List<Artifact> artifacts;
+    private List<Artifact> artifacts = new ArrayList<>(); // Be careful! we don't want the list initialized to NULL since we can't add things to a NULL list
 
     public Wizard() {
     }
@@ -48,5 +49,12 @@ public class Wizard implements Serializable {
 
     public void setArtifacts(List<Artifact> artifacts) {
         this.artifacts = artifacts;
+    }
+
+    public void addArtifact(Artifact artifact) {
+
+        artifact.setOwner(this);
+        this.artifacts.add(artifact);
+
     }
 }
