@@ -14,6 +14,7 @@ public class ArtifactService {
     }
 
     public Artifact findById(String artifactId){
-        return null;
+        return this.artifactRepository.findById(artifactId) // Try to find it, or else throw an exception
+                .orElseThrow(() -> new ArtifactNotFoundException(artifactId)); // get retrieves the actual object from Optional wrapper class
     }
 }
