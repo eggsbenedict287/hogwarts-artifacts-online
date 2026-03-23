@@ -57,4 +57,8 @@ public class Wizard implements Serializable {
         this.artifacts.add(artifact);
 
     }
+
+    public Integer getNumberOfArtifacts() {
+        return this.artifacts.size(); // OOP principal, the calling class should not know that much about the inner working of the other class
+    }
 }
