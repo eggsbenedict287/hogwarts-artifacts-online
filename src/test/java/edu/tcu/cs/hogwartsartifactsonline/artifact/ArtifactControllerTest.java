@@ -10,26 +10,18 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import tools.jackson.databind.ObjectMapper;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @AutoConfigureMockMvc
@@ -180,6 +172,65 @@ class ArtifactControllerTest {
                 .andExpect(jsonPath("$.data.imageUrl").value(savedArtifact.getImageUrl()));
 
 
+
+    }
+
+    @Test
+    void testUpdateArtifactSuccess() throws Exception {
+        //Given - prepare a fake DTO record
+        ArtifactDto artifactDto = new ArtifactDto(null,
+                "Invisibility Cloak",
+                "A new description",
+                "imageUrl",
+                null);
+
+        String json = this.objectMapper.writeValueAsString(artifactDto); // Serialize string
+
+        Artifact updatedArtifact = new Artifact();
+        updatedArtifact.setId("1250808601744904192");
+        updatedArtifact.setName("Invisibility Cloak");
+        updatedArtifact.setDescription("A new description."); // Just changed the description
+        updatedArtifact.setImageUrl("ImageUrl");
+
+        given(this.artifactService.update(eq("1250808601744904192"),Mockito.any(Artifact.class))).willReturn(updatedArtifact); // Given an artifact, return it
+
+
+
+        // When and Then
+        this.mockMvc.perform(put("/api/v1/artifacts/1250808601744904192").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Update Success"))
+                .andExpect(jsonPath("$.data.id").value("1250808601744904192"))
+                .andExpect(jsonPath("$.data.name").value(updatedArtifact.getName()))
+                .andExpect(jsonPath("$.data.description").value(updatedArtifact.getDescription()))
+                .andExpect(jsonPath("$.data.imageUrl").value(updatedArtifact.getImageUrl()));
+    }
+
+    @Test
+    void testUpdateArtifactErrorWithNonExistentId() throws Exception {
+
+        //Given - prepare a fake DTO record
+        ArtifactDto artifactDto = new ArtifactDto(null,
+                "Invisibility Cloak",
+                "A new description",
+                "imageUrl",
+                null);
+
+        String json = this.objectMapper.writeValueAsString(artifactDto); // Serialize string
+
+
+
+        given(this.artifactService.update(eq("1250808601744904192"),Mockito.any(Artifact.class))).willThrow(new ArtifactNotFoundException("1250808601744904192")); // Given an artifact, return it
+
+
+
+        // When and Then
+        this.mockMvc.perform(put("/api/v1/artifacts/1250808601744904192").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find artifact with Id 1250808601744904192 :("))
+                .andExpect(jsonPath("$.data").isEmpty());
 
     }
 }

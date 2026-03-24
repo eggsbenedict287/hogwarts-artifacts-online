@@ -33,4 +33,19 @@ public class ArtifactService {
         newArtifact.setId(idWorker.nextId() + ""); // Generate the ID, and then we simply convert it to String with a concat
         return this.artifactRepository.save(newArtifact); // The ownter will be NULL
     }
+
+    public Artifact update(String artifactId, Artifact update){
+        return this.artifactRepository.findById(artifactId)
+                .map(oldArtifact -> {
+                    oldArtifact.setName(update.getName());
+                    oldArtifact.setDescription(update.getDescription());
+                    oldArtifact.setImageUrl(update.getImageUrl());
+                    Artifact updatedArtifact = this.artifactRepository.save(oldArtifact);
+                    return updatedArtifact;
+                })
+                .orElseThrow(() -> new ArtifactNotFoundException(artifactId));
+
+
+
+    }
 }
