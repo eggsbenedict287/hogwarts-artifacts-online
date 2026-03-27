@@ -19,8 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) // Using mock a class, simulate a class
 // Test class
@@ -209,6 +208,46 @@ class ArtifactServiceTest {
 
         // Then
         verify(artifactRepository, times(1)).findById("1250808601744904192");
+
+    }
+
+    @Test
+    void testDeleteSuccess(){
+        // Given
+        Artifact artifact = new Artifact();
+
+        artifact.setId("1250808601744904192");
+        artifact.setName("Invisibility Cloak");
+        artifact.setDescription("An invisibility cloak is used to make the wearer invisible.");
+        artifact.setImageUrl("ImageUrl");
+
+        given(artifactRepository.findById("1250808601744904192")).willReturn(Optional.of(artifact));
+        doNothing().when(artifactRepository).deleteById("1250808601744904192"); // Since deleteById returns nothing, we must test it this way
+
+        // When
+        artifactService.delete("1250808601744904192"); // Invoke the service you want to test
+
+        // Then
+        verify(artifactRepository, times(1)).deleteById("1250808601744904192"); // Since it returns nothing, we just simply check that it was called once
+
+
+    }
+
+    @Test
+    void testDeleteNotFound(){
+        // Given
+
+        given(artifactRepository.findById("1250808601744904192")).willReturn(Optional.empty()); // the repository will return nothing
+
+
+        // When
+        assertThrows(ArtifactNotFoundException.class, () -> {
+           artifactService.delete("1250808601744904192");
+        });
+
+        // Then
+        verify(artifactRepository, times(1)).findById("1250808601744904192"); // Since it returns nothing, we just simply check that it was called once
+
 
     }
 

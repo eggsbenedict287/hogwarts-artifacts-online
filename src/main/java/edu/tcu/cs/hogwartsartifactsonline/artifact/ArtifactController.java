@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/api/v1/artifacts") // base request mapping
 public class ArtifactController {
 
     private final ArtifactService artifactService;
@@ -26,7 +27,7 @@ public class ArtifactController {
         this.artifactDtoToArtifactConverter = artifactDtoToArtifactConverter;
     }
 
-    @GetMapping("/api/v1/artifacts/{artifactId}") // implements API endpoint GET request
+    @GetMapping("/{artifactId}") // implements API endpoint GET request
     public Result findArtifactById(@PathVariable String artifactId){ //@PathVariable binds these two variables
         Artifact foundArtifact =  this.artifactService.findById(artifactId);
         ArtifactDto artifactDto = this.artifactToArtifactDtoConverter.convert(foundArtifact);
@@ -35,7 +36,7 @@ public class ArtifactController {
     }
 
 
-    @GetMapping("/api/v1/artifacts")
+    @GetMapping
     public Result findAllArtifacts(){
         List<Artifact> foundArtifacts = this.artifactService.findAll();
         // Convert foundArtifacts to a list of artifactDtos
@@ -46,7 +47,7 @@ public class ArtifactController {
         return new Result(true,StatusCode.SUCCESS,"Find All Success",artifactDtos);
     }
 
-    @PostMapping("/api/v1/artifacts")
+    @PostMapping
     public Result addArtifact(@Valid @RequestBody ArtifactDto artifactDto){ // Annotation lets Spring know to bind the artifacts to the JSON request, make sure its valid
 
         // Convert artifactDto to artifact
@@ -57,13 +58,19 @@ public class ArtifactController {
         return new Result(true,StatusCode.SUCCESS, "Add Success", savedArtifactDto);
     }
 
-    @PutMapping("/api/v1/artifacts/{artifactId}")
+    @PutMapping("/{artifactId}")
     public Result updateArtifact( @PathVariable String artifactId, @Valid @RequestBody ArtifactDto artifactDto){
         Artifact update = this.artifactDtoToArtifactConverter.convert(artifactDto);
         Artifact updatedArtifact = this.artifactService.update(artifactId, update);
         ArtifactDto updatedArtifactDto = this.artifactToArtifactDtoConverter.convert(updatedArtifact);
 
         return new Result(true, StatusCode.SUCCESS, "Update Success", updatedArtifactDto);
+    }
+
+    @DeleteMapping("/{artifactId}")
+    public Result deleteArtifact(@PathVariable String artifactId){
+        this.artifactService.delete(artifactId); // No conversion neccessary
+        return new Result(true, StatusCode.SUCCESS, "Delete Success");
     }
 
 }
