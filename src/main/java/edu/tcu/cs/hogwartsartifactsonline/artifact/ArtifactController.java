@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/artifacts") // base request mapping
+@RequestMapping("${api.endpoint.base-url}/artifacts") // base request mapping
 public class ArtifactController {
 
     private final ArtifactService artifactService;
