@@ -59,20 +59,20 @@ public class DBDataInitializer implements CommandLineRunner {
 
         Wizard w1 = new Wizard();
         w1.setName("Albus Dumbledore");
-        w1.setId(1);
+        // w1.setId(1);
         w1.addArtifact(a1);
         w1.addArtifact(a3);
         // Don't manually set the id for the wizard, let the database generate it.
 
         Wizard w2 = new Wizard();
         w2.setName("Harry Potter");
-        w2.setId(2);
+        // w2.setId(2);
         w2.addArtifact(a2);
         w2.addArtifact(a4);
 
         Wizard w3 = new Wizard();
         w3.setName("Neville Longbottom");
-        w3.setId(3);
+        // w3.setId(3);
         w3.addArtifact(a5);
 
         // We import all wizards, since the cascade type is et to import all artifacts associated with those wizards
