@@ -48,4 +48,12 @@ public class ArtifactService {
 
 
     }
+
+    public void delete(String artifactId){
+        Artifact artifact = this.artifactRepository.findById(artifactId)
+                .orElseThrow(() -> new ArtifactNotFoundException(artifactId));// first check if it exists, if no exception thrown then artifact to delete is found
+
+        this.artifactRepository.deleteById(artifactId);
+
+    }
 }
